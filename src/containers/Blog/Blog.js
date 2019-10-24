@@ -10,10 +10,10 @@ import Axios from 'axios';
 
 class Blog extends Component {
 
-    state = {posts: []};
+    state = { posts: [], error: false };
 
-    componentDidMount(){
-        Axios.get('https://jsonplaceholder.typicode.com/posts').then(response => {
+    componentDidMount() {
+        Axios.get('/posts').then(response => {
             const posts = response.data.slice(0, 4);
             const updatedPosts = posts.map(post => {
                 return {
@@ -21,29 +21,35 @@ class Blog extends Component {
                     author: 'Torben'
                 }
             })
-            this.setState({posts: updatedPosts});
-        })
+            this.setState({ posts: updatedPosts });
+        }).catch(err => {
+            console.log(err);
+            this.setState({ error: true });
+        });
     }
 
     postSelectedHandler = (postId) => {
-        this.setState({selectedPostId: postId})
+        this.setState({ selectedPostId: postId })
     }
 
 
-    render () {
-        const posts = this.state.posts.map(post => <Post 
-            title={post.title} 
-            author={post.author} 
-            key={post.id}
-            clicked={() => this.postSelectedHandler(post.id)}/>);
+    render() {
+        let posts = <p>Something wrent wrong :-( !</p>;
 
+        if (!this.state.error) {
+            posts = this.state.posts.map(post => <Post
+                title={post.title}
+                author={post.author}
+                key={post.id}
+                clicked={() => this.postSelectedHandler(post.id)} />);
+        }
         return (
             <div>
                 <section className="Posts">
                     {posts}
                 </section>
                 <section>
-                    <FullPost id={this.state.selectedPostId}/>
+                    <FullPost id={this.state.selectedPostId} />
                 </section>
                 <section>
                     <NewPost />
