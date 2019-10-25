@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import Axios from 'axios';
 import Post from '../../components/Post/Post';
-import { Link } from 'react-router-dom';
+import FullPost from '../FullPost/FullPost';
+import { Route } from 'react-router-dom';
 import './Posts.css';
 
 class Posts extends Component {
@@ -15,7 +16,7 @@ class Posts extends Component {
 
     componentDidMount() {
         Axios.get('/posts').then(response => {
-            const posts = response.data.slice(0, 10);
+            const posts = response.data.slice(0, 4);
             const updatedPosts = posts.map(post => {
                 return {
                     ...post,
@@ -30,7 +31,7 @@ class Posts extends Component {
     }
 
     postSelectedHandler = (postId) => {
-        this.setState({ selectedPostId: postId })
+        this.props.history.push({pathname: "/"+ postId});
     }
 
     render() {
@@ -38,20 +39,23 @@ class Posts extends Component {
 
         if (!this.state.error) {
             posts = this.state.posts.map(post =>
-                <Link 
-                    to={"/post/"+post.id}
-                    key={post.id}
-                    >
+                //<Link to={"/post/"+post.id}>
                     <Post
+                        key={post.id}
                         title={post.title}
                         author={post.author}
+                        clicked={()=> this.postSelectedHandler(post.id)}
                          />
-                </Link>)
+                //</Link>
+                )
         }
 
         return (
             <section className="Posts">
                 {posts}
+                <div>
+                    <Route path={'/:id'} component={FullPost} />
+                </div>
             </section>
         )
     }
